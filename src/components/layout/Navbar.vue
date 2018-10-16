@@ -42,6 +42,7 @@ export default {
   },
   methods: {
     changePath(data) {
+        console.log(1)
      this.$router.push(this.path[Number(data)]);
     }
   }

@@ -9,10 +9,39 @@ const CopyWebpackPlugin = require('copy-webpack-plugin')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const FriendlyErrorsPlugin = require('friendly-errors-webpack-plugin')
 const portfinder = require('portfinder')
-
 const HOST = process.env.HOST
 const PORT = process.env.PORT && Number(process.env.PORT)
-
+var express = require('express');
+var MongoClient = require('mongodb').MongoClient;
+var url = "mongodb://localhost:27017/";
+var app = express();
+var dbo =""
+var closedb=""
+app.all('*', function(req, res, next) {             //设置跨域访问
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Headers", "X-Requested-With");
+    res.header("Access-Control-Allow-Methods","PUT,POST,GET,DELETE,OPTIONS");
+    res.header("X-Powered-By",' 3.2.1');
+    res.header("Content-Type", "application/json;charset=utf-8");
+    next();
+ });
+ MongoClient.connect(url, function(err, db) {
+  if (err) throw err;
+  dbo= db.db("data");
+  closedb=db
+});
+ app.get('/api',function(req,res){ 
+  dbo.collection("user").find({"name":"jiying","password":"123654"}).toArray(function(err, result) { // 返回集合中所有数据
+    if (err) throw err;
+    res.status(200),
+    res.json(result)
+});
+})
+ var server = app.listen(3002,function(){
+    var host = server.address().address;
+    var port = server.address().port;
+    console.log('listen at http://%s:%s',host,port)
+})
 const devWebpackConfig = merge(baseWebpackConfig, {
   module: {
     rules: utils.styleLoaders({ sourceMap: config.dev.cssSourceMap, usePostCSS: true })
